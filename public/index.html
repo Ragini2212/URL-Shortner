@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Shortener</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>URL Shortener</h1>
+
+  <form id="shorten-form">
+    <input type="text" name="originalUrl" placeholder="Enter a URL" required />
+    <button type="submit">Shorten</button>
+  </form>
+
+  <div id="shortened-url" style="display: none;">
+    <p>Your shortened URL:</p>
+    <a id="short-url-link" href=""></a>
+  </div>
+
+  <script>
+    const form = document.getElementById('shorten-form');
+    const shortenedUrlDiv = document.getElementById('shortened-url');
+    const shortUrlLink = document.getElementById('short-url-link');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const originalUrl = formData.get('originalUrl');
+      
+      fetch('/shorten', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ originalUrl }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        shortenedUrlDiv.style.display = 'block';
+        shortUrlLink.textContent = window.location.origin + '/' + data.shortId;
+        shortUrlLink.href = data.originalUrl;
+        form.reset();
+      })
+      .catch(error => {
+        console.error(error);
+        alert('An error occurred. Please try again.');
+      });
+    });
+  </script>
+</body>
+</html>
